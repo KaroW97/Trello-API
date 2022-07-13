@@ -1,0 +1,36 @@
+{
+  "name": "trello-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint -c @eslintrc/.eslintrc.js **/*.js --fix",
+    "devStart": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaroW97/Trello-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KaroW97/Trello-API/issues"
+  },
+  "homepage": "https://github.com/KaroW97/Trello-API#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "chance": "^1.1.8",
+    "express": "^4.18.1",
+    "joi": "^17.6.0",
+    "uuid": "^8.3.2",
+    "winston": "^3.8.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "nodemon": "^2.0.19"
+  }
+}

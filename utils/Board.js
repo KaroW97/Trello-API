@@ -5,6 +5,7 @@ module.exports = class Board {
     this.color = undefined
     this.description = undefined
     this.createAt = undefined
+    this.changed = true
   }
 
   setId(id) {
@@ -15,36 +16,12 @@ module.exports = class Board {
     return this.id
   }
 
-  setName(name) {
-    this.name = name
+  setChanged() {
+    this.changed = false
   }
 
-  getName() {
-    return this.name
-  }
-
-  setColor(color) {
-    this.color = color
-  }
-
-  getColor() {
-    return this.color
-  }
-
-  setDescription(description) {
-    this.description = description
-  }
-
-  getDescription() {
-    return this.description
-  }
-
-  setCreateAt(createAt) {
-    this.createAt = createAt
-  }
-
-  getCreateAt() {
-    return this.description
+  getChanged() {
+    return this.changed
   }
 
   compare(data) {

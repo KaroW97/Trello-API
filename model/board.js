@@ -1,5 +1,5 @@
 const Joi = require('joi')
-const { createBoard } = require('../utils/boardHelpers')
+const { createBoard } = require('../utils/common')
 
 const schemaCreate = Joi.object({
   id: Joi.string().required(),

@@ -1,4 +1,6 @@
+const { v4: uuid } = require('uuid')
 const fs = require('fs')
+
 const BACKUP_DB = './localDB/boardBackup.json'
 const BOARD_DB = './localDB/board.json'
 
@@ -55,10 +57,17 @@ const deleteBackup = () => {
   }, 100)
 }
 
+const createBoard = (body) => ({
+  id: uuid(),
+  ...body
+})
+
 module.exports = {
   checkIfExists,
   stringify,
   createBackup,
   deleteBackup,
-  restoreBackup
+  restoreBackup,
+  BOARD_DB,
+  createBoard
 }

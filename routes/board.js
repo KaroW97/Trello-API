@@ -1,14 +1,15 @@
-const { joiCreateItem, joiUpdateItem } = require('../model/board')
-const { deleteRecord } = require('../moduls/delete')
-const { updateRecord } = require('../moduls/update')
-const { addNewRecord } = require('../moduls/add')
-const { getBoardItem } = require('../moduls/getById')
-const { logger } = require('../utils/logger')
-const { getAll } = require('../moduls/getAll')
+const { joiCreateItem, joiUpdateItem } = require('../joiModels/board')
+const { board } = require('../components/index')
 const express = require('express')
-const { stringify, deleteBackup, restoreBackup } = require('../utils/common')
-
+const {
+  deleteBackup,
+  restoreBackup,
+  randomCardArray,
+  LOGGER_TYPES
+} = require('../utils/common')
+const logger = require('../logger/loggerUtils')
 const router = express.Router()
+
 
 //TODO: Add diferenciation to type of users:
 // console.log(req.headers['x-access-token']);
@@ -21,13 +22,15 @@ router.get('/', async (req, res) => {
   try {
     res.setHeader('Transfer-Encoding', 'chunked')
 
-    await getAll(res)
+    await board.getAll(res)
 
-    logger.info('Successfully fetched all items')
+    logger.success(LOGGER_TYPES.FETCH)
   } catch (err) {
-    logger.error(` Error during GET ALL fetch: ${err}`)
+    const { message } = err
 
-    res.status(400).json({ err: err.message })
+    logger.error(LOGGER_TYPES.ERROR_FETCH, message)
+
+    res.status(400).json({ err: message })
 
     throw err
   }
@@ -40,15 +43,17 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
 
-    const item = await getBoardItem(id)
+    const item = await board.getBoardItem(id)
 
-    logger.info(`Successfully fetched item with id: ${id}`)
+    logger.success(LOGGER_TYPES.FETCH_BY_ID, id)
 
     res.status(200).json(item)
   } catch (err) {
-    logger.error(`Error during GET BY ID fetch: ${err}`)
+    const { message } = err
 
-    res.status(400).json({ err: err.message })
+    logger.error(LOGGER_TYPES.ERROR_FETCH_BY_ID, message)
+
+    res.status(400).json({ err: message })
 
     throw err
   }
@@ -61,19 +66,19 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params
 
-    const deletedItem = await deleteRecord(id)
+    const deletedItem = await board.deleteRecord(id)
 
-    logger.info(
-      `Successfully deleted item with id: ${id} with ${stringify(deletedItem)}`
-    )
+    logger.success(LOGGER_TYPES.DELETE, deletedItem)
 
     res.status(200).json(deletedItem)
   } catch (err) {
-    logger.error(`Error during DELETE: ${err}`)
+    const { message } = err
+
+    logger.error(LOGGER_TYPES.ERROR_DELETE, message)
 
     await restoreBackup()
 
-    res.status(400).json({ err: err.message })
+    res.status(400).json({ err: message })
 
     throw err
   } finally {
@@ -90,19 +95,19 @@ router.put('/:id', async (req, res) => {
 
     const joiBody = joiUpdateItem({ id, ...req.body })
 
-    await updateRecord({ id, ...req.body })
+    await board.updateRecord({ id, ...req.body })
 
-    logger.info(
-      `Successfully updated item with id: ${id} with ${stringify(joiBody)}`
-    )
+    logger.success(LOGGER_TYPES.UPDATE, joiBody)
 
     res.status(200).json(joiBody)
   } catch (err) {
-    logger.error(`Error during UPDATE: ${err}`)
+    const { message } = err
+
+    logger.error(LOGGER_TYPES.ERROR_UPDATE, message)
 
     await restoreBackup()
 
-    res.status(400).json({ err: err.message })
+    res.status(400).json({ err: message })
 
     throw err
   } finally {
@@ -117,24 +122,41 @@ router.post('/', async (req, res) => {
   try {
     const { body } = req
 
-    const joiBody = joiCreateItem(body)
+    const cards = randomCardArray()
 
-    await addNewRecord(joiBody)
+    const joiBody = joiCreateItem({ ...body, cards: cards })
 
-    logger.info(`Successfully save of ${stringify(joiBody)}`)
+    await board.addNewRecord(joiBody)
+
+    logger.success(LOGGER_TYPES.ADD, joiBody)
 
     res.status(200).json(joiBody)
   } catch (err) {
-    logger.error(`Error during save: ${err}`)
+    const { message } = err
+
+    logger.error(LOGGER_TYPES.ERROR_ADD, message)
 
     await restoreBackup()
 
-    res.status(400).json({ err: err.message })
+    res.status(400).json({ err: message })
 
     throw err
   } finally {
     deleteBackup()
   }
 })
+
+/* router.use((req, res, next) => {
+  res.status(404);
+
+  logger.error(`404: Page not found`)
+
+  if (req.accepts('html')) {
+    res.send({ err: '404: Page not found' });
+    return;
+  }
+
+  res.send('Not found');
+}) */
 
 module.exports = router

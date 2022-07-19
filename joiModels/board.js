@@ -6,7 +6,8 @@ const schemaCreate = Joi.object({
   name: Joi.string().required(),
   color: Joi.string().required(),
   description: Joi.string().required(),
-  createAt: Joi.date().required()
+  createAt: Joi.date().required(),
+  cards: Joi.array().required()
 })
 
 const schemaUpdate = Joi.object({
@@ -14,7 +15,8 @@ const schemaUpdate = Joi.object({
   name: Joi.string(),
   color: Joi.string(),
   description: Joi.string(),
-  createAt: Joi.date()
+  createAt: Joi.date(),
+  cards: Joi.array()
 })
 
 const joiValidate = (data, schema) => {

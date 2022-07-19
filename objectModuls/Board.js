@@ -5,7 +5,9 @@ module.exports = class Board {
     this.color = undefined
     this.description = undefined
     this.createAt = undefined
+    this.cards = undefined
     this.changed = true
+    this.recordExists = true
   }
 
   setId(id) {
@@ -14,6 +16,14 @@ module.exports = class Board {
 
   getId() {
     return this.id
+  }
+
+  setRecordExists() {
+    this.recordExists = false
+  }
+
+  getRecordExists() {
+    return this.recordExists
   }
 
   setChanged() {
@@ -25,7 +35,7 @@ module.exports = class Board {
   }
 
   compare(data) {
-    let { id, name, color, description, createAt } = data || {}
+    let { id, name, color, description, createAt, cards } = data || {}
 
     if (this.name !== undefined && name !== this.name) name = this.name
     if (this.color !== undefined && color !== this.color) color = this.color
@@ -33,18 +43,21 @@ module.exports = class Board {
       description = this.description
     if (this.createAt !== undefined && createAt !== this.createAt)
       createAt = this.createAt
+    // if (this.cards !== undefined && cards !== this.cards)
+    // cards = this.cards
 
-    return { id, name, color, description, createAt }
+    return { id, name, color, description, createAt, cards }
   }
 
   setAll(data) {
-    const { id, name, color, description, createAt } = data
+    const { id, name, color, description, createAt, cards } = data
 
     this.id = id
     this.name = name
     this.color = color
     this.description = description
     this.createAt = createAt
+    this.cards = cards
   }
 
   getAll() {
@@ -53,7 +66,8 @@ module.exports = class Board {
       name: this.name,
       color: this.color,
       description: this.description,
-      createAt: this.createAt
+      createAt: this.createAt,
+      cards: this.cards
     }
   }
 }

@@ -4,7 +4,7 @@ const {
   stringify,
   createBackup,
   BOARD_DB
-} = require('../utils/common')
+} = require('../../utils/common')
 const fs = require('fs')
 
 const deleteBracket = new Transform({
@@ -16,7 +16,7 @@ const deleteBracket = new Transform({
   }
 })
 
-exports.addNewRecord = async (joiBody) => {
+exports.addNewRecord = async (body) => {
   const ifExists = await checkIfExists(BOARD_DB)
 
   const writeStream = fs.createWriteStream(BOARD_DB, { encoding: 'utf-8' })
@@ -28,8 +28,8 @@ exports.addNewRecord = async (joiBody) => {
 
     createBackup(readStream)
 
-    writeStream.write('[' + stringify(joiBody) + ', ')
+    writeStream.write('[' + stringify(body) + ', ')
   }
 
-  if (!ifExists) writeStream.write(stringify([joiBody]))
+  if (!ifExists) writeStream.write(stringify([body]))
 }

@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { checkIfExists, BOARD_DB } = require('../utils/common')
+const { checkIfExists, BOARD_DB } = require('../../utils/common')
 
 exports.getBoardItem = async (id) => {
   let item = {}

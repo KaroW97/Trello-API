@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { BOARD_DB, checkIfExists } = require('../utils/common')
+const { BOARD_DB, checkIfExists } = require('../../utils/common')
 
 exports.getAll = async (res) => {
   const ifExists = await checkIfExists(BOARD_DB)

@@ -1,8 +1,23 @@
 const { v4: uuid } = require('uuid')
+const Chance = require('chance')
+const chance = new Chance()
 const fs = require('fs')
 
 const BACKUP_DB = './localDB/boardBackup.json'
 const BOARD_DB = './localDB/board.json'
+
+const LOGGER_TYPES = {
+  FETCH: 'FETCH',
+  FETCH_BY_ID: 'FETCH_BY_ID',
+  DELETE: 'DELETE',
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+  ERROR_FETCH: 'ERROR_FETCH',
+  ERROR_FETCH_BY_ID: 'ERROR_FETCH_BY_ID',
+  ERROR_DELETE: 'ERROR_DELETE',
+  ERROR_UPDATE: 'ERROR_UPDATE',
+  ERROR_ADD: 'ERROR_ADD'
+}
 
 /**
  * Checks if file already exists
@@ -59,8 +74,28 @@ const deleteBackup = () => {
 
 const createBoard = (body) => ({
   id: uuid(),
+  createAt: new Date,
   ...body
 })
+
+const createRandomCard = () => ({
+  id: uuid(),
+  name: chance.name(),
+  description: chance.string(),
+  createAt: chance.date(),
+  estimate: chance.date(),
+  status: chance.integer({ min: -20, max: 20 }),
+  dueDate: chance.date(),
+  labels: [chance.string()]
+})
+
+const randomCardArray = () => {
+  let randomArray = []
+  for (let i = 0; i < 3; i++) {
+    randomArray.push(createRandomCard())
+  }
+  return randomArray
+}
 
 module.exports = {
   checkIfExists,
@@ -69,5 +104,7 @@ module.exports = {
   deleteBackup,
   restoreBackup,
   BOARD_DB,
-  createBoard
+  createBoard,
+  randomCardArray,
+  LOGGER_TYPES
 }

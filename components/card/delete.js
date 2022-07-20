@@ -1,11 +1,10 @@
 const { Transform } = require('stream')
 const {
-  checkIfExists,
   stringify,
-  createBackup,
-  BOARD_DB
+  BOARD_DB,
+  validateFile,
+  streamHandler
 } = require('../../utils/common')
-const fs = require('fs')
 const Board = require('../../objectModuls/Board')
 const Card = require('../../objectModuls/Card')
 const board = new Board()
@@ -20,7 +19,7 @@ const deleteCardItem = new Transform({
 
     const itemIdnex = toObject.findIndex((element) => element.id === getId)
 
-    if (itemIdnex === -1) board.setChanged()
+    if (itemIdnex === -1) board.setRecordExists()
 
     if (itemIdnex !== -1) {
       // board.setAll(toObject[itemIdnex])
@@ -42,30 +41,22 @@ const deleteCardItem = new Transform({
 })
 
 exports.deleteCard = async (boardId, cardId) => {
-  const ifExists = await checkIfExists(BOARD_DB)
+  await validateFile(BOARD_DB)
 
-  if (!ifExists) throw new Error('File does not exist')
-
-  const writeStream = fs.createWriteStream(BOARD_DB)
+  const { readStream, writeStream } = streamHandler(BOARD_DB)
 
   board.setId(boardId)
 
   card.setId(cardId)
 
-  const readStream = fs.createReadStream(BOARD_DB)
-
-  createBackup(readStream)
-
   readStream.pipe(deleteCardItem).pipe(writeStream)
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
-      if (!board.getChanged())
-        rejects(
-          new Error(`DELETE: No data for given board id found: ${boardId}`)
-        )
+      if (!board.getRecordExists())
+        rejects(new Error(`No data for given board id found: ${boardId}`))
       if (!card.getRecordExists())
-        rejects(new Error(`DELETE: No data for given card id found: ${cardId}`))
+        rejects(new Error(`No data for given card id found: ${cardId}`))
       resolve(card.getAll())
     })
     writeStream.on('error', (error) => rejects(error))

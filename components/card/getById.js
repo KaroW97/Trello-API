@@ -1,14 +1,10 @@
 const fs = require('fs')
-const Board = require('../../objectModuls/Board')
-const { checkIfExists, BOARD_DB } = require('../../utils/common')
-const board = new Board()
+const { validateFile, BOARD_DB } = require('../../utils/common')
 
 exports.getCardItem = async (boardId, cardId) => {
   let boardItem = {}
 
-  const ifExists = await checkIfExists(BOARD_DB)
-
-  if (!ifExists) throw new Error('File does not exist')
+  await validateFile(BOARD_DB)
 
   const readStream = fs.createReadStream(BOARD_DB, { encoding: 'utf-8' })
 
@@ -17,14 +13,12 @@ exports.getCardItem = async (boardId, cardId) => {
 
     const boardRecord = parse.filter((board) => board.id === boardId)
 
-    if (!boardRecord.length) board.setRecordExists()
-
     boardItem = boardRecord
   })
 
   return new Promise((resolve, rejects) => {
     readStream.on('end', () => {
-      if (!board.getRecordExists())
+      if (!boardItem.length)
         rejects(new Error(`No data for for given boardId ${boardId}`))
     })
 

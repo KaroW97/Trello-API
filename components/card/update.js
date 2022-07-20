@@ -1,11 +1,10 @@
 const { Transform } = require('stream')
 const {
-  checkIfExists,
   stringify,
-  createBackup,
-  BOARD_DB
+  validateFile,
+  BOARD_DB,
+  streamHandler
 } = require('../../utils/common')
-const fs = require('fs')
 const Board = require('../../objectModuls/Board')
 const Card = require('../../objectModuls/Card')
 const board = new Board()
@@ -19,7 +18,7 @@ const updateBoardItem = new Transform({
       (element) => element.id === board.getId()
     )
 
-    if (itemIdnex === -1) board.setChanged()
+    if (itemIdnex === -1) board.setRecordExists()
 
     if (itemIdnex !== -1) {
       const cardIndex = toObject[itemIdnex].cards.findIndex(
@@ -30,6 +29,8 @@ const updateBoardItem = new Transform({
 
       if (cardIndex !== -1) {
         const compared = card.compare(toObject[itemIdnex].cards[cardIndex])
+
+        card.setAll(compared)
 
         toObject[itemIdnex].cards.splice(cardIndex, 1, compared)
       }
@@ -45,19 +46,13 @@ const updateBoardItem = new Transform({
  * @returns
  */
 exports.updateCard = async (data) => {
-  const ifExists = await checkIfExists(BOARD_DB)
+  await validateFile(BOARD_DB)
 
-  if (!ifExists) throw new Error('File does not exist')
-
-  const writeStream = fs.createWriteStream(BOARD_DB)
+  const { readStream, writeStream } = streamHandler(BOARD_DB)
 
   board.setId(data.boardId)
 
   card.setAll(data)
-
-  const readStream = fs.createReadStream(BOARD_DB)
-
-  createBackup(readStream)
 
   // During update only board elements are changed
   // To update cards field we need to go under correct url path
@@ -65,14 +60,11 @@ exports.updateCard = async (data) => {
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
-      if (!board.getChanged())
-        rejects(
-          new Error(`DELETE: No data for given board id found: ${data.boardId}`)
-        )
+      if (!board.getRecordExists())
+        rejects(new Error(`No data for given board id found: ${data.boardId}`))
       if (!card.getRecordExists())
-        rejects(
-          new Error(`DELETE: No data for given card id found: ${data.id}`)
-        )
+        rejects(new Error(`No data for given card id found: ${data.id}`))
+
       resolve(card.getAll())
     })
     writeStream.on('error', (error) => rejects(error))

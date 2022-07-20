@@ -1,14 +1,10 @@
 const fs = require('fs')
-const { BOARD_DB, checkIfExists } = require('../../utils/common')
+const { BOARD_DB, validateFile } = require('../../utils/common')
 
 exports.getAll = async (res) => {
-  const ifExists = await checkIfExists(BOARD_DB)
+  await validateFile(BOARD_DB)
 
-  if (!ifExists) throw new Error('File does not exist')
-
-  const readStream = fs.createReadStream(BOARD_DB, {
-    encoding: 'utf-8'
-  })
+  const readStream = fs.createReadStream(BOARD_DB)
 
   readStream.on('data', (data) => res.write(data))
 

@@ -1,12 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const { joiUpdateItem, joiCreateItem } = require('../joiModels/card')
-const { restoreBackup, deleteBackup, LOGGER_TYPES } = require('../utils/common')
+const { restoreBackup, deleteFile, LOGGER_TYPES } = require('../utils/common')
 const { card } = require('../components/index')
 const logger = require('../logger/loggerUtils')
 const cache = require('memory-cache')
-
-
 
 /**
  * Get all cards
@@ -17,9 +15,11 @@ router.get('/:boardId', async (req, res) => {
 
     const { boardId } = req.params
 
-    await card.getAllCards(res, boardId)
+    const cards = await card.getAllCards(res, boardId)
 
     logger.success(LOGGER_TYPES.FETCH, boardId)
+
+    res.status(200).json(cards)
   } catch (err) {
     const { message } = err
 
@@ -81,7 +81,7 @@ router.delete('/:boardId/:cardId', async (req, res) => {
 
     throw err
   } finally {
-    deleteBackup()
+    deleteFile()
   }
 })
 
@@ -114,7 +114,7 @@ router.post('/:boardId', async (req, res) => {
 
     throw err
   } finally {
-    deleteBackup()
+    deleteFile()
   }
 })
 
@@ -145,21 +145,8 @@ router.put('/:boardId/:id', async (req, res) => {
 
     throw err
   } finally {
-    deleteBackup()
+    deleteFile()
   }
 })
-
-/* router.use((req, res, next) => {
-  res.status(404);
-
-  logger.error(`404: Page not found`)
-
-  if (req.accepts('html')) {
-    res.send({ err: '404: Page not found' });
-    return;
-  }
-
-  res.send('Not found');
-}) */
 
 module.exports = router

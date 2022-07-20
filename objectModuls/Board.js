@@ -6,8 +6,8 @@ module.exports = class Board {
     this.description = undefined
     this.createAt = undefined
     this.cards = undefined
-    this.changed = true
     this.recordExists = true
+    this.fillWithEmptyArray = false
   }
 
   setId(id) {
@@ -26,12 +26,12 @@ module.exports = class Board {
     return this.recordExists
   }
 
-  setChanged() {
-    this.changed = false
+  setFillWithEmptyArray() {
+    this.fillWithEmptyArray = true
   }
 
-  getChanged() {
-    return this.changed
+  getFillWithEmptyArray() {
+    return this.fillWithEmptyArray
   }
 
   compare(data) {

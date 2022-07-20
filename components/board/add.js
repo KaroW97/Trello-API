@@ -3,33 +3,39 @@ const {
   checkIfExists,
   stringify,
   createBackup,
-  BOARD_DB
+  BOARD_DB,
+  checkIfEmpty
 } = require('../../utils/common')
 const fs = require('fs')
+const Board = require('../../objectModuls/Board')
+const board = new Board()
 
 const deleteBracket = new Transform({
   transform(chunk, encoding, callback) {
-    const indexOfBracket = chunk.indexOf('[')
-    const slicedString = chunk.slice(indexOfBracket + 1)
+    let toObject = JSON.parse(chunk.toString())
 
-    callback(null, slicedString.toString())
+    toObject.push(board.getAll())
+
+    callback(null, stringify(toObject))
   }
 })
 
 exports.addNewRecord = async (body) => {
-  const ifExists = await checkIfExists(BOARD_DB)
+  const ifExists = await checkIfExists()
+
+  const ifEmpty = await checkIfEmpty()
 
   const writeStream = fs.createWriteStream(BOARD_DB, { encoding: 'utf-8' })
 
-  if (ifExists) {
+  if (ifExists && !ifEmpty) {
     const readStream = fs.createReadStream(BOARD_DB, { encoding: 'utf-8' })
-
-    readStream.pipe(deleteBracket).pipe(writeStream)
 
     createBackup(readStream)
 
-    writeStream.write('[' + stringify(body) + ', ')
+    board.setAll(body)
+
+    readStream.pipe(deleteBracket).pipe(writeStream)
   }
 
-  if (!ifExists) writeStream.write(stringify([body]))
+  if (!ifExists || ifEmpty) writeStream.write(stringify([body]))
 }

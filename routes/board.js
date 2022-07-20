@@ -2,14 +2,13 @@ const { joiCreateItem, joiUpdateItem } = require('../joiModels/board')
 const { board } = require('../components/index')
 const express = require('express')
 const {
-  deleteBackup,
+  deleteFile,
   restoreBackup,
   randomCardArray,
   LOGGER_TYPES
 } = require('../utils/common')
 const logger = require('../logger/loggerUtils')
 const router = express.Router()
-
 
 //TODO: Add diferenciation to type of users:
 // console.log(req.headers['x-access-token']);
@@ -27,6 +26,8 @@ router.get('/', async (req, res) => {
     logger.success(LOGGER_TYPES.FETCH)
   } catch (err) {
     const { message } = err
+
+    res.removeHeader('Transfer-Encoding')
 
     logger.error(LOGGER_TYPES.ERROR_FETCH, message)
 
@@ -82,7 +83,7 @@ router.delete('/:id', async (req, res) => {
 
     throw err
   } finally {
-    deleteBackup()
+    deleteFile()
   }
 })
 
@@ -111,7 +112,7 @@ router.put('/:id', async (req, res) => {
 
     throw err
   } finally {
-    deleteBackup()
+    deleteFile()
   }
 })
 
@@ -142,21 +143,8 @@ router.post('/', async (req, res) => {
 
     throw err
   } finally {
-    deleteBackup()
+    await deleteFile()
   }
 })
-
-/* router.use((req, res, next) => {
-  res.status(404);
-
-  logger.error(`404: Page not found`)
-
-  if (req.accepts('html')) {
-    res.send({ err: '404: Page not found' });
-    return;
-  }
-
-  res.send('Not found');
-}) */
 
 module.exports = router

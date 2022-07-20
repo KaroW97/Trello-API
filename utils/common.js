@@ -24,7 +24,7 @@ const LOGGER_TYPES = {
  * @param {string} fileName
  * @returns {boolean}
  */
-const checkIfExists = async (fileName) => {
+const checkIfExists = async (fileName = BOARD_DB) => {
   try {
     await fs.promises.access(fileName)
     return true
@@ -54,19 +54,20 @@ const createBackup = (data) => {
  * Change backup database name to regular one and delete broken data
  */
 const restoreBackup = async () => {
-  deleteBackup(BOARD_DB)
+  deleteFile(BOARD_DB)
+
   fs.promises.rename(BACKUP_DB, BOARD_DB)
 }
 
 /**
  * Delete backup database
  */
-const deleteBackup = () => {
-  setInterval(() => {
-    const isExists = checkIfExists(BACKUP_DB)
+const deleteFile = (fileName = BACKUP_DB) => {
+  setInterval(async () => {
+    const ifExists = await checkIfExists(fileName)
 
-    if (isExists) {
-      fs.promises.unlink(BACKUP_DB)
+    if (ifExists) {
+      fs.promises.unlink(fileName)
       clearInterval(100)
     }
   }, 100)
@@ -74,7 +75,7 @@ const deleteBackup = () => {
 
 const createBoard = (body) => ({
   id: uuid(),
-  createAt: new Date,
+  createAt: new Date(),
   ...body
 })
 
@@ -97,14 +98,50 @@ const randomCardArray = () => {
   return randomArray
 }
 
+const checkIfEmpty = async () => {
+  const ifExists = await checkIfExists(BOARD_DB)
+
+  if (ifExists) {
+    const { size } = await fs.promises.stat(BOARD_DB)
+
+    if (size === 0) return true
+    return false
+  }
+
+  return true
+}
+
+const validateFile = async () => {
+  const ifExists = await checkIfExists(BOARD_DB)
+
+  if (!ifExists) throw new Error('File does not exist')
+
+  if (!(await fs.promises.stat(BOARD_DB)).size) throw new Error('File is empty')
+}
+
+const streamHandler = (fileName) => {
+  const writeStream = fs.createWriteStream(fileName)
+
+  const readStream = fs.createReadStream(fileName)
+
+  createBackup(readStream)
+
+  return {
+    writeStream,
+    readStream
+  }
+}
 module.exports = {
   checkIfExists,
   stringify,
   createBackup,
-  deleteBackup,
+  deleteFile,
   restoreBackup,
-  BOARD_DB,
   createBoard,
   randomCardArray,
+  validateFile,
+  streamHandler,
+  checkIfEmpty,
+  BOARD_DB,
   LOGGER_TYPES
 }

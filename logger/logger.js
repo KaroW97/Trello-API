@@ -4,7 +4,8 @@ const { createLogger, format, transports } = require('winston')
 const env = process.env.NODE_ENV || 'development'
 
 const logger = createLogger({
-  format: format.combine(format.colorize(), format.json())
+  level: 'info',
+  format: format.json()
 })
 
 if (env === 'production') {

@@ -1,12 +1,10 @@
 const fs = require('fs')
-const { checkIfExists, BOARD_DB } = require('../../utils/common')
+const { BOARD_DB, validateFile } = require('../../utils/common')
 
 exports.getBoardItem = async (id) => {
   let item = {}
 
-  const ifExists = await checkIfExists(BOARD_DB)
-
-  if (!ifExists) throw new Error('File does not exist')
+  await validateFile(BOARD_DB)
 
   const readStream = fs.createReadStream(BOARD_DB, { encoding: 'utf-8' })
 

@@ -77,8 +77,12 @@ module.exports = class Card {
       status = this.status
     if (this.dueDate !== undefined && dueDate !== this.dueDate)
       dueDate = this.dueDate
-    if (this.labels !== undefined && labels !== this.labels)
-      labels = this.labels
+    if (this.labels !== undefined && labels !== this.labels) {
+      const noRepeat = this.labels.filter((label) => !labels.includes(label))
+
+      labels = [...labels, ...noRepeat]
+    }
+    if (this.labels !== undefined && !this.labels.length) labels = []
 
     return {
       id,

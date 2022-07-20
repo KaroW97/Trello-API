@@ -1,11 +1,10 @@
 const { Transform } = require('stream')
 const {
-  checkIfExists,
   stringify,
-  createBackup,
-  BOARD_DB
+  BOARD_DB,
+  validateFile,
+  streamHandler
 } = require('../../utils/common')
-const fs = require('fs')
 const Board = require('../../objectModuls/Board')
 const board = new Board()
 
@@ -13,11 +12,9 @@ const updateBoardItem = new Transform({
   transform(chunk, encoding, callback) {
     const toObject = JSON.parse(chunk.toString())
 
-    const itemIdnex = toObject.findIndex(
-      (element) => element.id === board.getId()
-    )
+    const itemIdnex = toObject.findIndex((item) => item.id === board.getId())
 
-    if (itemIdnex === -1) board.setChanged()
+    if (itemIdnex === -1) board.setRecordExists()
 
     if (itemIdnex !== -1) {
       const compared = board.compare(toObject[itemIdnex])
@@ -35,17 +32,11 @@ const updateBoardItem = new Transform({
  * @returns
  */
 exports.updateRecord = async (data) => {
-  const ifExists = await checkIfExists(BOARD_DB)
+  await validateFile(BOARD_DB)
 
-  if (!ifExists) throw new Error('File does not exist')
-
-  const writeStream = fs.createWriteStream(BOARD_DB)
+  const { readStream, writeStream } = streamHandler(BOARD_DB)
 
   board.setAll(data)
-
-  const readStream = fs.createReadStream(BOARD_DB)
-
-  createBackup(readStream)
 
   // During update only board elements are changed
   // To update cards field we need to go under correct url path
@@ -53,7 +44,7 @@ exports.updateRecord = async (data) => {
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
-      if (!board.getChanged())
+      if (!board.getRecordExists())
         rejects(new Error(`No data for given id found: ${data.id}`))
       resolve(board.getAll())
     })

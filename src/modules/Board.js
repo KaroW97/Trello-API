@@ -5,6 +5,9 @@ module.exports = class Board {
     this.color = undefined
     this.description = undefined
     this.createAt = undefined
+    this.cards = undefined
+    this.recordExists = true
+    this.fillWithEmptyArray = false
   }
 
   setId(id) {
@@ -15,40 +18,24 @@ module.exports = class Board {
     return this.id
   }
 
-  setName(name) {
-    this.name = name
+  setRecordExists() {
+    this.recordExists = false
   }
 
-  getName() {
-    return this.name
+  getRecordExists() {
+    return this.recordExists
   }
 
-  setColor(color) {
-    this.color = color
+  setFillWithEmptyArray() {
+    this.fillWithEmptyArray = true
   }
 
-  getColor() {
-    return this.color
-  }
-
-  setDescription(description) {
-    this.description = description
-  }
-
-  getDescription() {
-    return this.description
-  }
-
-  setCreateAt(createAt) {
-    this.createAt = createAt
-  }
-
-  getCreateAt() {
-    return this.description
+  getFillWithEmptyArray() {
+    return this.fillWithEmptyArray
   }
 
   compare(data) {
-    let { id, name, color, description, createAt } = data || {}
+    let { id, name, color, description, createAt, cards } = data || {}
 
     if (this.name !== undefined && name !== this.name) name = this.name
     if (this.color !== undefined && color !== this.color) color = this.color
@@ -56,18 +43,20 @@ module.exports = class Board {
       description = this.description
     if (this.createAt !== undefined && createAt !== this.createAt)
       createAt = this.createAt
+    if (this.cards !== undefined && !this.cards.length) cards = []
 
-    return { id, name, color, description, createAt }
+    return { id, name, color, description, createAt, cards }
   }
 
   setAll(data) {
-    const { id, name, color, description, createAt } = data
+    const { id, name, color, description, createAt, cards } = data
 
     this.id = id
     this.name = name
     this.color = color
     this.description = description
     this.createAt = createAt
+    this.cards = cards
   }
 
   getAll() {
@@ -76,7 +65,8 @@ module.exports = class Board {
       name: this.name,
       color: this.color,
       description: this.description,
-      createAt: this.createAt
+      createAt: this.createAt,
+      cards: this.cards
     }
   }
 }

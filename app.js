@@ -1,9 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const Card = require('./routes/card')
-const Board = require('./routes/board')
+const { Card, Board } = require('./src/index')
 const helmet = require('helmet')
-const logger = require('./logger/loggerUtils')
+const { logger, common, errors } = require('./src/lib/index')
 
 const app = express()
 
@@ -16,10 +15,10 @@ app.use('/card', Card)
 app.use((req, res) => {
   res.status(404)
 
-  logger.error('404: Page not found')
+  logger.error('PAGE_LOAD_ERROR', new errors.NotFound())
 
   if (req.accepts('html')) {
-    res.send({ err: '404: Page not found' })
+    res.send(common.errorMessage(new errors.NotFound()))
     return
   }
 

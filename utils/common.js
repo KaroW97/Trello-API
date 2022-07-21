@@ -2,6 +2,7 @@ const { v4: uuid } = require('uuid')
 const Chance = require('chance')
 const chance = new Chance()
 const fs = require('fs')
+const { FileError, FileErrorEmpty } = require('./errors')
 
 const BACKUP_DB = './localDB/boardBackup.json'
 const BOARD_DB = './localDB/board.json'
@@ -114,9 +115,10 @@ const checkIfEmpty = async () => {
 const validateFile = async () => {
   const ifExists = await checkIfExists(BOARD_DB)
 
-  if (!ifExists) throw new Error('File does not exist')
+  if (!ifExists) throw new FileError(BOARD_DB)
 
-  if (!(await fs.promises.stat(BOARD_DB)).size) throw new Error('File is empty')
+  if (!(await fs.promises.stat(BOARD_DB)).size)
+    throw new FileErrorEmpty(BOARD_DB)
 }
 
 const streamHandler = (fileName) => {
@@ -131,6 +133,10 @@ const streamHandler = (fileName) => {
     readStream
   }
 }
+
+const errorMessage = ({ name, message }) => ({
+  error: { name, message }
+})
 module.exports = {
   checkIfExists,
   stringify,
@@ -142,6 +148,7 @@ module.exports = {
   validateFile,
   streamHandler,
   checkIfEmpty,
+  errorMessage,
   BOARD_DB,
   LOGGER_TYPES
 }

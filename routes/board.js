@@ -1,18 +1,18 @@
-const { joiCreateItem, joiUpdateItem } = require('../joiModels/board')
+const { joiCreateItem, joiUpdateItem } = require('../joiModels/joiValidation')
 const { board } = require('../components/index')
 const express = require('express')
 const {
   deleteFile,
   restoreBackup,
   randomCardArray,
-  LOGGER_TYPES
+  LOGGER_TYPES,
+  errorMessage
 } = require('../utils/common')
 const logger = require('../logger/loggerUtils')
 const router = express.Router()
 
 //TODO: Add diferenciation to type of users:
 // console.log(req.headers['x-access-token']);
-//TODO: Check if object contains only brackets if so dont add comma at the end of new record
 
 /**
  * Get all boards
@@ -25,13 +25,11 @@ router.get('/', async (req, res) => {
 
     logger.success(LOGGER_TYPES.FETCH)
   } catch (err) {
-    const { message } = err
-
     res.removeHeader('Transfer-Encoding')
 
-    logger.error(LOGGER_TYPES.ERROR_FETCH, message)
+    logger.error(LOGGER_TYPES.ERROR_FETCH, err)
 
-    res.status(400).json({ err: message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   }
@@ -50,11 +48,9 @@ router.get('/:id', async (req, res) => {
 
     res.status(200).json(item)
   } catch (err) {
-    const { message } = err
+    logger.error(LOGGER_TYPES.ERROR_FETCH_BY_ID, err)
 
-    logger.error(LOGGER_TYPES.ERROR_FETCH_BY_ID, message)
-
-    res.status(400).json({ err: message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   }
@@ -73,13 +69,11 @@ router.delete('/:id', async (req, res) => {
 
     res.status(200).json(deletedItem)
   } catch (err) {
-    const { message } = err
-
-    logger.error(LOGGER_TYPES.ERROR_DELETE, message)
+    logger.error(LOGGER_TYPES.ERROR_DELETE, err)
 
     await restoreBackup()
 
-    res.status(400).json({ err: message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   } finally {
@@ -102,13 +96,11 @@ router.put('/:id', async (req, res) => {
 
     res.status(200).json(joiBody)
   } catch (err) {
-    const { message } = err
-
-    logger.error(LOGGER_TYPES.ERROR_UPDATE, message)
+    logger.error(LOGGER_TYPES.ERROR_UPDATE, err)
 
     await restoreBackup()
 
-    res.status(400).json({ err: message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   } finally {
@@ -125,7 +117,7 @@ router.post('/', async (req, res) => {
 
     const cards = randomCardArray()
 
-    const joiBody = joiCreateItem({ ...body, cards: cards })
+    const joiBody = await joiCreateItem({ ...body, cards: cards })
 
     await board.addNewRecord(joiBody)
 
@@ -133,13 +125,11 @@ router.post('/', async (req, res) => {
 
     res.status(200).json(joiBody)
   } catch (err) {
-    const { message } = err
-
-    logger.error(LOGGER_TYPES.ERROR_ADD, message)
+    logger.error(LOGGER_TYPES.ERROR_ADD, err)
 
     await restoreBackup()
 
-    res.status(400).json({ err: message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   } finally {

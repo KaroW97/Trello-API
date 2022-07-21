@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { BOARD_DB, validateFile } = require('../../utils/common')
+const { NoDataFound } = require('../../utils/errors')
 
 exports.getBoardItem = async (id) => {
   let item = {}
@@ -16,7 +17,7 @@ exports.getBoardItem = async (id) => {
 
   return new Promise((resolve, rejects) => {
     readStream.on('end', () => {
-      if (!item.length) rejects(new Error(`No data for given id ${id}`))
+      if (!item.length) rejects(new NoDataFound(id))
       resolve(item)
     })
     readStream.on('error', (error) => rejects(error))

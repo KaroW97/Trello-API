@@ -1,5 +1,5 @@
-require('dotenv').config()
 const { createLogger, format, transports } = require('winston')
+require('dotenv').config()
 
 const env = process.env.NODE_ENV || 'development'
 

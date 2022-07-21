@@ -6,6 +6,7 @@ const {
   streamHandler
 } = require('../../utils/common')
 const Board = require('../../objectModuls/Board')
+const { NoDataFound } = require('../../utils/errors')
 const board = new Board()
 
 const updateBoardItem = new Transform({
@@ -44,8 +45,7 @@ exports.updateRecord = async (data) => {
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
-      if (!board.getRecordExists())
-        rejects(new Error(`No data for given id found: ${data.id}`))
+      if (!board.getRecordExists()) rejects(new NoDataFound(data.id))
       resolve(board.getAll())
     })
     writeStream.on('error', (error) => rejects(error))

@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { validateFile, BOARD_DB } = require('../../utils/common')
+const { NoDataFound } = require('../../utils/errors')
 
 exports.getCardItem = async (boardId, cardId) => {
   let boardItem = {}
@@ -18,15 +19,13 @@ exports.getCardItem = async (boardId, cardId) => {
 
   return new Promise((resolve, rejects) => {
     readStream.on('end', () => {
-      if (!boardItem.length)
-        rejects(new Error(`No data for for given boardId ${boardId}`))
+      if (!boardItem.length) rejects(new NoDataFound(boardId))
     })
 
     readStream.on('close', () => {
       const item = boardItem[0].cards.filter((card) => card.id === cardId)
 
-      if (!item.length)
-        rejects(new Error(`No data for for given card id ${cardId}`))
+      if (!item.length) rejects(new NoDataFound(cardId, true))
 
       resolve(item)
     })

@@ -7,6 +7,7 @@ const {
 } = require('../../utils/common')
 const Board = require('../../objectModuls/Board')
 const Card = require('../../objectModuls/Card')
+const { NoDataFound } = require('../../utils/errors')
 const board = new Board()
 const card = new Card()
 
@@ -53,10 +54,8 @@ exports.deleteCard = async (boardId, cardId) => {
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
-      if (!board.getRecordExists())
-        rejects(new Error(`No data for given board id found: ${boardId}`))
-      if (!card.getRecordExists())
-        rejects(new Error(`No data for given card id found: ${cardId}`))
+      if (!board.getRecordExists()) rejects(new NoDataFound(boardId))
+      if (!card.getRecordExists()) rejects(new NoDataFound(cardId, true))
       resolve(card.getAll())
     })
     writeStream.on('error', (error) => rejects(error))

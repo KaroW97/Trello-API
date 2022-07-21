@@ -43,14 +43,13 @@ module.exports = class Board {
       description = this.description
     if (this.createAt !== undefined && createAt !== this.createAt)
       createAt = this.createAt
-    // if (this.cards !== undefined && cards !== this.cards)
-    // cards = this.cards
+    if (this.cards !== undefined && !this.cards.length) cards = []
 
-    return { id, name, color, description, createAt, cards }
+    return { id, createAt, name, color, description, cards }
   }
 
   setAll(data) {
-    const { id, name, color, description, createAt, cards } = data
+    const { id, createAt, name, color, description, cards } = data
 
     this.id = id
     this.name = name

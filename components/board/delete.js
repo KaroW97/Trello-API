@@ -6,6 +6,7 @@ const {
   streamHandler
 } = require('../../utils/common')
 const Board = require('../../objectModuls/Board')
+const { BadRequest } = require('../../utils/errors')
 const board = new Board()
 
 const deleteBoardItem = new Transform({
@@ -40,7 +41,7 @@ exports.deleteRecord = async (id) => {
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
       if (!board.getRecordExists())
-        rejects(new Error(`No data for given id found: ${id}`))
+        rejects(new BadRequest(`No data for given id found: ${id}`))
       resolve(board.getAll())
     })
     writeStream.on('error', (error) => rejects(error))

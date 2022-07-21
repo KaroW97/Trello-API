@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { BOARD_DB, validateFile } = require('../../utils/common')
+const { NoDataFound, TransferError } = require('../../utils/errors')
 
 exports.getAllCards = async (res, boardId) => {
   let item = {}
@@ -17,12 +18,9 @@ exports.getAllCards = async (res, boardId) => {
 
   return new Promise((resolve, rejects) => {
     readStream.on('end', () => {
-      if (!item.length)
-        rejects(new Error(`No data for given board id found: ${boardId}`))
+      if (!item.length) rejects(new NoDataFound(boardId))
       resolve(item)
     })
-    readStream.on('error', () =>
-      rejects(new Error('Error occurred during transfer'))
-    )
+    readStream.on('error', () => rejects(new TransferError()))
   })
 }

@@ -1,7 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const { joiUpdateItem, joiCreateItem } = require('../joiModels/card')
-const { restoreBackup, deleteFile, LOGGER_TYPES } = require('../utils/common')
+const { joiUpdateItem, joiCreateItem } = require('../joiModels/joiValidation')
+const {
+  restoreBackup,
+  deleteFile,
+  LOGGER_TYPES,
+  errorMessage
+} = require('../utils/common')
 const { card } = require('../components/index')
 const logger = require('../logger/loggerUtils')
 const cache = require('memory-cache')
@@ -21,11 +26,9 @@ router.get('/:boardId', async (req, res) => {
 
     res.status(200).json(cards)
   } catch (err) {
-    const { message } = err
+    logger.error(LOGGER_TYPES.ERROR_FETCH, err)
 
-    logger.error(LOGGER_TYPES.ERROR_FETCH, message)
-
-    res.status(400).json({ err: message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   }
@@ -46,11 +49,9 @@ router.get('/:boardId/:cardId', async (req, res) => {
 
     res.send(cardItem)
   } catch (err) {
-    const { message } = err
+    logger.error(LOGGER_TYPES.ERROR_FETCH_BY_ID, err)
 
-    logger.error(LOGGER_TYPES.ERROR_FETCH_BY_ID, message)
-
-    res.status(400).json({ err: err.message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   }
@@ -71,13 +72,11 @@ router.delete('/:boardId/:cardId', async (req, res) => {
 
     res.status(200).json(deletedItem)
   } catch (err) {
-    const { message } = err
-
-    logger.error(LOGGER_TYPES.ERROR_DELETE, message)
+    logger.error(LOGGER_TYPES.ERROR_DELETE, err)
 
     await restoreBackup()
 
-    res.status(400).json({ err: err.message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   } finally {
@@ -96,7 +95,7 @@ router.post('/:boardId', async (req, res) => {
 
     const { body } = req
 
-    const joiBody = joiCreateItem(body)
+    const joiBody = await joiCreateItem(body)
 
     await card.addNewCard({ boardId, ...joiBody })
 
@@ -104,13 +103,11 @@ router.post('/:boardId', async (req, res) => {
 
     res.status(200).json(joiBody)
   } catch (err) {
-    const { message } = err
-
-    logger.error(LOGGER_TYPES.ERROR_ADD, message)
+    logger.error(LOGGER_TYPES.ERROR_ADD, err)
 
     await restoreBackup()
 
-    res.status(400).json({ err: err.message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   } finally {
@@ -135,13 +132,11 @@ router.put('/:boardId/:id', async (req, res) => {
 
     res.status(200).json(joiBody)
   } catch (err) {
-    const { message } = err
-
-    logger.error(LOGGER_TYPES.ERROR_UPDATE, message)
+    logger.error(LOGGER_TYPES.ERROR_UPDATE, err)
 
     await restoreBackup()
 
-    res.status(400).json({ err: err.message })
+    res.status(400).json(errorMessage(err))
 
     throw err
   } finally {

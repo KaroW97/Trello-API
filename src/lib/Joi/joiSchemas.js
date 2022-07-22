@@ -1,5 +1,8 @@
 const Joi = require('joi')
 
+/**
+ * Board schemas
+ */
 const schemaCreateBoard = Joi.object({
   id: Joi.string().required(),
   name: Joi.string().required(),
@@ -18,6 +21,9 @@ const schemaUpdateBoard = Joi.object({
   cards: Joi.array()
 })
 
+/**
+ * Card schemas
+ */
 const schemaCreateCard = Joi.object({
   id: Joi.string().required(),
   name: Joi.string().required(),

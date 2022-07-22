@@ -6,8 +6,10 @@ const fs = require('fs')
  * Change backup database name to regular one and delete broken data
  */
 const restoreBackup = async () => {
+  // Delete current board db
   deleteFile(BOARD_DB)
 
+  // Change name of backup db to board db
   fs.promises.rename(BACKUP_DB, BOARD_DB)
 }
 
@@ -23,6 +25,7 @@ const createBackup = (data) => {
 
 /**
  * Delete backup database
+ * @param {string} fileName
  */
 const deleteFile = (fileName = BACKUP_DB) => {
   setInterval(async () => {

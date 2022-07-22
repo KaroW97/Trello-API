@@ -61,6 +61,9 @@ class TransferError extends Error {
   }
 }
 
+/**
+ * User has no permission to access
+ */
 class AccessDenied extends Error {
   constructor() {
     super('FORBIDDEN')

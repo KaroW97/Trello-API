@@ -12,17 +12,15 @@ app.use(helmet())
 app.use('/', Board)
 app.use('/card', Card)
 
+/**
+ * When page is not in the scope throw error
+ */
 app.use((req, res) => {
   res.status(404)
 
   logger.error('PAGE_LOAD_ERROR', new errors.NotFound())
 
-  if (req.accepts('html')) {
-    res.send(common.errorMessage(new errors.NotFound()))
-    return
-  }
-
-  res.send('Not found')
+  res.send(common.errorMessage(new errors.NotFound()))
 })
 
 app.listen(3000)

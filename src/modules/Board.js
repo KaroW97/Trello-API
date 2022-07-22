@@ -1,15 +1,30 @@
 module.exports = class Board {
   constructor() {
+    /*** @type {string}*/
     this.id = undefined
+
+    /*** @type {string}*/
     this.name = undefined
+
+    /*** @type {string}*/
     this.color = undefined
+
+    /*** @type {string}*/
     this.description = undefined
+
+    /*** @type {Date}*/
     this.createAt = undefined
+
+    /*** @type {Record<string, string | string[] | number | Date}*/
     this.cards = undefined
+
+    /*** @type {boolean}*/
     this.recordExists = true
-    this.fillWithEmptyArray = false
   }
 
+  /**
+   * @param {string} id
+   */
   setId(id) {
     this.id = id
   }
@@ -18,22 +33,26 @@ module.exports = class Board {
     return this.id
   }
 
+  /**
+   * Set false if record is not in DB
+   */
   setRecordExists() {
     this.recordExists = false
   }
 
+  /**
+   * Return weather the record exists or not
+   * @returns {boolean}
+   */
   getRecordExists() {
     return this.recordExists
   }
 
-  setFillWithEmptyArray() {
-    this.fillWithEmptyArray = true
-  }
-
-  getFillWithEmptyArray() {
-    return this.fillWithEmptyArray
-  }
-
+  /**
+   * Returns object with changed fields
+   * @param {Record<string, string | Record<string,unknown>[] | number | Date} data
+   * @returns {Record<string, string | Record<string, unknown>[] | number | Date}
+   */
   compare(data) {
     let { id, name, color, description, createAt, cards } = data || {}
 
@@ -48,6 +67,10 @@ module.exports = class Board {
     return { id, name, color, description, createAt, cards }
   }
 
+  /**
+   * Set data for board
+   * @param {Record<string, string | Record<string,unknown>[] | number | Date} data
+   */
   setAll(data) {
     const { id, name, color, description, createAt, cards } = data
 
@@ -59,6 +82,10 @@ module.exports = class Board {
     this.cards = cards
   }
 
+  /**
+   * Returns all values set for board
+   * @returns {Record<string, string | Recor<string, unknown>[] | number | Date}
+   */
   getAll() {
     return {
       id: this.id,

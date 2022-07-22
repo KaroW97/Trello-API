@@ -1,15 +1,21 @@
 const fs = require('fs')
 const { errors, validation, variable } = require('../../lib/index')
 
+/**
+ * Returns item with given id from DB
+ * @param {string} id
+ * @returns {Promise<Record<string, Record<string, unknown>[] | string | number | Data> | Error>}
+ */
 exports.getBoardItem = async (id) => {
   let item = {}
 
+  // Validate file
   await validation.validateFile()
 
-  const readStream = fs.createReadStream(variable.BOARD_DB, {
-    encoding: 'utf-8'
-  })
+  // Create read stream
+  const readStream = fs.createReadStream(variable.BOARD_DB)
 
+  // When data search for the one with proper id
   readStream.on('data', (data) => {
     const parse = JSON.parse(data)
 
@@ -18,7 +24,10 @@ exports.getBoardItem = async (id) => {
 
   return new Promise((resolve, rejects) => {
     readStream.on('end', () => {
+      // Throw error if record doesn't exist
       if (!item.length) rejects(new errors.NoDataFound(id))
+
+      // Resolve card data
       resolve(item)
     })
     readStream.on('error', (error) => rejects(error))

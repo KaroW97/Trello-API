@@ -16,26 +16,43 @@ const checkIfExists = async (fileName = BOARD_DB) => {
   }
 }
 
-const checkIfEmpty = async () => {
-  const ifExists = await checkIfExists(BOARD_DB)
+/**
+ * Checks if file is empty
+ * @returns {Promise<boolean>}
+ */
+const checkIfEmpty = async (filePath = BOARD_DB) => {
+  // Check if exist
+  const ifExists = await checkIfExists(filePath)
 
+  // If yes check size
   if (ifExists) {
-    const { size } = await fs.promises.stat(BOARD_DB)
+    const { size } = await fs.promises.stat(filePath)
 
+    // If 0 return true as the file is empty
     if (size === 0) return true
+
+    // Else return false
     return false
   }
 
+  // If file doesn't exist return true by default
   return true
 }
 
+/**
+ * Check if file exists and if is empty
+ * Throw proper error messages
+ * @param {string} filePath
+ */
 const validateFile = async (filePath = BOARD_DB) => {
+  // Check if exist
   const ifExists = await checkIfExists(filePath)
 
+  // If not throw File Error
   if (!ifExists) throw new FileError(filePath)
 
-  if (!(await fs.promises.stat(filePath)).size)
-    throw new FileErrorEmpty(filePath)
+  // If is empty
+  if (await checkIfEmpty(filePath)) throw new FileErrorEmpty(filePath)
 }
 
 module.exports = {

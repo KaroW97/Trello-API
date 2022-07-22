@@ -1,6 +1,9 @@
 exports.BACKUP_DB = './localDB/boardBackup.json'
 exports.BOARD_DB = './localDB/board.json'
 
+/**
+ * @type {Record<string, string>}
+ */
 exports.LOGGER_TYPES = {
   FETCH: 'FETCH',
   FETCH_BY_ID: 'FETCH_BY_ID',

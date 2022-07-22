@@ -1,20 +1,44 @@
 module.exports = class Card {
   constructor() {
+    /*** @type {string}*/
     this.id = undefined
+
+    /*** @type {string}*/
     this.name = undefined
+
+    /*** @type {string}*/
     this.description = undefined
+
+    /*** @type {Date}*/
     this.createAt = undefined
+
+    /*** @type {Date}*/
     this.estimate = undefined
+
+    /*** @type {number}*/
     this.status = undefined
+
+    /*** @type {Date}*/
     this.dueDate = undefined
+
+    /*** @type {string[]}*/
     this.labels = []
+
+    /*** @type {boolean}*/
     this.recordExists = true
   }
 
+  /**
+   * Set false if record is not in DB
+   */
   setRecordExists() {
     this.recordExists = false
   }
 
+  /**
+   * Return weather the record exists or not
+   * @returns {boolean}
+   */
   getRecordExists() {
     return this.recordExists
   }
@@ -27,6 +51,10 @@ module.exports = class Card {
     return this.id
   }
 
+  /**
+   * Set data for card
+   * @param {Record<string, string | string[] | number | Date} data
+   */
   setAll(data) {
     const {
       id,
@@ -49,6 +77,10 @@ module.exports = class Card {
     this.labels = labels
   }
 
+  /**
+   * Returns all values set for board
+   * @returns {Record<string, string | Recor<string, unknown>[] | number | Date>}
+   */
   getAll() {
     return {
       id: this.id,
@@ -62,6 +94,11 @@ module.exports = class Card {
     }
   }
 
+  /**
+   * Returns object with changed fields
+   * @param {Record<string, string | string[] | number | Date>} data
+   * @returns {Record<string, string | string[] | number | Date>}
+   */
   compare(data) {
     let { id, name, description, createAt, estimate, status, dueDate, labels } =
       data

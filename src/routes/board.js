@@ -1,4 +1,4 @@
-const { board } = require('../components/index')
+const { board } = require('../service/index')
 const express = require('express')
 const {
   logger,

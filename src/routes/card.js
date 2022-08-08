@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { card } = require('../components/index')
+const { card } = require('../service/index')
 const {
   logger,
   variable,

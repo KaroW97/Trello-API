@@ -1,8 +1,8 @@
 const { Transform } = require('stream')
 const { errors, validation, common } = require('../../lib/index')
-const { board, card } = require('../../modules/index')
+const { board, card } = require('../../models/index')
 
-const deleteBracket = new Transform({
+const addNew = new Transform({
   transform(chunk, encoding, callback) {
     // Parse
     const toObject = JSON.parse(chunk.toString())
@@ -39,7 +39,7 @@ exports.addNewCard = async (body) => {
   card.setAll(body)
 
   // Save changes
-  readStream.pipe(deleteBracket).pipe(writeStream)
+  readStream.pipe(addNew).pipe(writeStream)
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {

@@ -1,6 +1,6 @@
 const { Transform } = require('stream')
 const { errors, validation, common } = require('../../lib/index')
-const { board } = require('../../modules/index')
+const { board } = require('../../models/index')
 
 const deleteBoardItem = new Transform({
   transform(chunk, encoding, callback) {

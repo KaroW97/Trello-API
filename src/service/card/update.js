@@ -1,8 +1,8 @@
 const { Transform } = require('stream')
 const { errors, validation, common } = require('../../lib/index')
-const { board, card } = require('../../modules/index')
+const { board, card } = require('../../models/index')
 
-const deleteCardItem = new Transform({
+const updateBoardItem = new Transform({
   transform(chunk, encoding, callback) {
     // Parse
     const toObject = JSON.parse(chunk.toString())
@@ -23,11 +23,16 @@ const deleteCardItem = new Transform({
       // If cardIndex is -1 setRecordExists field to false
       if (cardIndex === -1) card.setRecordExists()
 
-      // If itemIndex is not -1 then delete element from array
+      // If itemIndex is not -1 change current item to new one
       if (cardIndex !== -1) {
-        card.setAll(boardCards[cardIndex])
+        // Update current item with new data
+        const compared = card.compare(boardCards[cardIndex])
 
-        boardCards.splice(cardIndex, 1)
+        // Set card elements to retrieve later
+        card.setAll(compared)
+
+        // Change element to new one
+        boardCards.splice(cardIndex, 1, compared)
       }
     }
 
@@ -36,12 +41,12 @@ const deleteCardItem = new Transform({
 })
 
 /**
- * Delete card item
- * @param {string} boardId
- * @param {string} cardId
+ * Update card item
+ * @param {Record<string, string | Record<string, string | string[]>>} data
  * @returns {Promise<Record<string, string | number | Date | Recor<string, unknown>[]> | Error>}
  */
-exports.deleteCard = async (boardId, cardId) => {
+exports.updateCard = async (data) => {
+  const { id, boardId } = data
   // Validate file
   await validation.validateFile()
 
@@ -51,17 +56,17 @@ exports.deleteCard = async (boardId, cardId) => {
   // Set board id
   board.setId(boardId)
 
-  // Set card id
-  card.setId(cardId)
+  // Set card data
+  card.setAll(data)
 
   // Save changes
-  readStream.pipe(deleteCardItem).pipe(writeStream)
+  readStream.pipe(updateBoardItem).pipe(writeStream)
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
       // Throw error if record doesn't exist
       if (!board.getRecordExists()) rejects(new errors.NoDataFound(boardId))
-      if (!card.getRecordExists()) rejects(new errors.NoDataFound(cardId, true))
+      if (!card.getRecordExists()) rejects(new errors.NoDataFound(id, true))
 
       // Resolve card data
       resolve(card.getAll())

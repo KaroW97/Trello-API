@@ -1,8 +1,8 @@
 const { Transform } = require('stream')
 const { errors, validation, common } = require('../../lib/index')
-const { board, card } = require('../../modules/index')
+const { board, card } = require('../../models/index')
 
-const updateBoardItem = new Transform({
+const deleteCardItem = new Transform({
   transform(chunk, encoding, callback) {
     // Parse
     const toObject = JSON.parse(chunk.toString())
@@ -23,16 +23,11 @@ const updateBoardItem = new Transform({
       // If cardIndex is -1 setRecordExists field to false
       if (cardIndex === -1) card.setRecordExists()
 
-      // If itemIndex is not -1 change current item to new one
+      // If itemIndex is not -1 then delete element from array
       if (cardIndex !== -1) {
-        // Update current item with new data
-        const compared = card.compare(boardCards[cardIndex])
+        card.setAll(boardCards[cardIndex])
 
-        // Set card elements to retrieve later
-        card.setAll(compared)
-
-        // Change element to new one
-        boardCards.splice(cardIndex, 1, compared)
+        boardCards.splice(cardIndex, 1)
       }
     }
 
@@ -41,12 +36,12 @@ const updateBoardItem = new Transform({
 })
 
 /**
- * Update card item
- * @param {Record<string, string | Record<string, string | string[]>>} data
+ * Delete card item
+ * @param {string} boardId
+ * @param {string} cardId
  * @returns {Promise<Record<string, string | number | Date | Recor<string, unknown>[]> | Error>}
  */
-exports.updateCard = async (data) => {
-  const { id, boardId } = data
+exports.deleteCard = async (boardId, cardId) => {
   // Validate file
   await validation.validateFile()
 
@@ -56,17 +51,17 @@ exports.updateCard = async (data) => {
   // Set board id
   board.setId(boardId)
 
-  // Set card data
-  card.setAll(data)
+  // Set card id
+  card.setId(cardId)
 
   // Save changes
-  readStream.pipe(updateBoardItem).pipe(writeStream)
+  readStream.pipe(deleteCardItem).pipe(writeStream)
 
   return new Promise((resolve, rejects) => {
     writeStream.on('finish', () => {
       // Throw error if record doesn't exist
       if (!board.getRecordExists()) rejects(new errors.NoDataFound(boardId))
-      if (!card.getRecordExists()) rejects(new errors.NoDataFound(id, true))
+      if (!card.getRecordExists()) rejects(new errors.NoDataFound(cardId, true))
 
       // Resolve card data
       resolve(card.getAll())

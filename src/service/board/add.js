@@ -1,11 +1,11 @@
 const fs = require('fs')
 const { Transform } = require('stream')
-const { board } = require('../../modules/index')
+const { board } = require('../../models/index')
 const { variable, validation, backupUtils, common } = require('../../lib/index')
 
 const { BOARD_DB } = variable
 
-const deleteBracket = new Transform({
+const addNew = new Transform({
   transform(chunk, encoding, callback) {
     // Parse
     let parse = JSON.parse(chunk.toString())
@@ -43,7 +43,7 @@ exports.addNewRecord = async (body) => {
     board.setAll(body)
 
     // Edit existing file
-    readStream.pipe(deleteBracket).pipe(writeStream)
+    readStream.pipe(addNew).pipe(writeStream)
   }
 
   if (!ifExists || ifEmpty) writeStream.write(common.stringify([body]))

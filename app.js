@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const { Card, Board } = require('./src/index')
 const helmet = require('helmet')
 const { logger, common, errors } = require('./src/lib/index')
+require('dotenv').config();
 
 const app = express()
 
@@ -23,4 +24,4 @@ app.use((req, res) => {
   res.send(common.errorMessage(new errors.NotFound()))
 })
 
-app.listen(3000)
+app.listen(process.env.PORT || 3000)

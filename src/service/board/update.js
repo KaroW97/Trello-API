@@ -36,7 +36,7 @@ exports.updateRecord = async (data) => {
   await validation.validateFile()
 
   // Get read and write streams
-  const { readStream, writeStream } = common.streamHandler()
+  const { readStream, writeStream } = await common.streamHandler(true)
 
   // Set data
   board.setAll(data)
@@ -52,7 +52,5 @@ exports.updateRecord = async (data) => {
       // Resolve board data
       resolve(board.getAll())
     })
-    writeStream.on('error', (error) => rejects(error))
-    readStream.on('error', (error) => rejects(error))
   })
 }

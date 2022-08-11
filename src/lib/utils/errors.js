@@ -53,11 +53,15 @@ class NotFound extends Error {
  * Some error occurred during fetch
  */
 class TransferError extends Error {
-  constructor() {
+  constructor(
+    details,
+    message = 'Error occurred during read or write process'
+  ) {
     super('INTERNAL_ERROR')
     this.status = 500
     this.name = 'INTERNAL_ERROR'
-    this.message = 'Error occurred during fetch'
+    this.message = message
+    this.details = details
   }
 }
 

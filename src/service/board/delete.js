@@ -35,7 +35,7 @@ exports.deleteRecord = async (id) => {
   await validation.validateFile()
 
   // Get read and write streams
-  const { readStream, writeStream } = common.streamHandler()
+  const { readStream, writeStream } = await common.streamHandler(true)
 
   // Set id
   board.setId(id)
@@ -52,7 +52,5 @@ exports.deleteRecord = async (id) => {
       // Resolve card data
       resolve(board.getAll())
     })
-    writeStream.on('error', (error) => rejects(error))
-    readStream.on('error', (error) => rejects(error))
   })
 }

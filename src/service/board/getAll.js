@@ -1,5 +1,4 @@
-const fs = require('fs')
-const { errors, variable, validation } = require('../../lib/index')
+const { validation, common } = require('../../lib/index')
 
 /**
  * Displays all elements from db
@@ -11,13 +10,12 @@ exports.getAll = async (res) => {
   await validation.validateFile()
 
   // Create read stream
-  const readStream = fs.createReadStream(variable.BOARD_DB)
+  const { readStream } = await common.streamHandler()
 
   // When data, display
   readStream.on('data', (data) => res.write(data))
 
-  return new Promise((resolve, rejects) => {
+  return new Promise((resolve) => {
     readStream.on('end', () => resolve(res.end()))
-    readStream.on('error', () => rejects(new errors.TransferError()))
   })
 }

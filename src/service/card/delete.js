@@ -46,7 +46,7 @@ exports.deleteCard = async (boardId, cardId) => {
   await validation.validateFile()
 
   // Get read and write streams
-  const { readStream, writeStream } = common.streamHandler()
+  const { readStream, writeStream } = await common.streamHandler(true)
 
   // Set board id
   board.setId(boardId)
@@ -66,7 +66,5 @@ exports.deleteCard = async (boardId, cardId) => {
       // Resolve card data
       resolve(card.getAll())
     })
-    writeStream.on('error', (error) => rejects(error))
-    readStream.on('error', (error) => rejects(error))
   })
 }

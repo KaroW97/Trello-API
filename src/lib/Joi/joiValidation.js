@@ -29,15 +29,17 @@ const joiValidate = (data, schema) => {
  * @param {boolean} isCreate - by default the create schema is taken
  * @returns {Promise<Joi.ObjectSchema<any>>}
  */
-const chooseSchema = async (isCreate = { isCreated: true }) => {
+const chooseSchema = async (isCreated = { created: true }) => {
   // Default value is board schemas
-  let schemaUpdateType = isCreate ? schemaCreateBoard : schemaUpdateBoard
+  const { created } = isCreated
+
+  let schemaUpdateType = created ? schemaCreateBoard : schemaUpdateBoard
 
   // Check if there is CARD value in cache
   const isCard = await cache.get('CARD')
 
   // If yes change schema type to card one
-  if (isCard) schemaUpdateType = isCreate ? schemaCreateCard : schemaUpdateCard
+  if (isCard) schemaUpdateType = created ? schemaCreateCard : schemaUpdateCard
 
   return schemaUpdateType
 }
@@ -48,7 +50,7 @@ const chooseSchema = async (isCreate = { isCreated: true }) => {
  */
 const joiUpdateItem = async (data) => {
   // Check if cache has specific value in
-  const schemaUpdateType = await chooseSchema({ isCreated: false })
+  const schemaUpdateType = await chooseSchema({ created: false })
 
   // Validate and return data
   return joiValidate(data, schemaUpdateType)

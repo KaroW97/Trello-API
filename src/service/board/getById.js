@@ -1,5 +1,4 @@
-const fs = require('fs')
-const { errors, validation, variable } = require('../../lib/index')
+const { errors, validation, common } = require('../../lib/index')
 
 /**
  * Returns item with given id from DB
@@ -13,7 +12,7 @@ exports.getBoardItem = async (id) => {
   await validation.validateFile()
 
   // Create read stream
-  const readStream = fs.createReadStream(variable.BOARD_DB)
+  const { readStream } = await common.streamHandler()
 
   // When data search for the one with proper id
   readStream.on('data', (data) => {
@@ -30,6 +29,5 @@ exports.getBoardItem = async (id) => {
       // Resolve card data
       resolve(item)
     })
-    readStream.on('error', (error) => rejects(error))
   })
 }

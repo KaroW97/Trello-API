@@ -3,7 +3,6 @@ const { success, error } = require('./logger/loggerUtils')
 const common = require('./utils/common')
 const errors = require('./utils/errors')
 const variable = require('./utils/variables')
-const backupUtils = require('./utils/backupUtils')
 const validation = require('./utils/validation')
 const authorize = require('./authorize/authorize')
 
@@ -19,7 +18,6 @@ module.exports = {
   common,
   errors,
   variable,
-  backupUtils,
   validation,
   authorize: authorize.authorize
 }

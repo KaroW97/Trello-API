@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const { Card, Board } = require('./src/index')
 const helmet = require('helmet')
 const { logger, common, errors } = require('./src/lib/index')
-require('dotenv').config();
+require('dotenv').config()
 
 const app = express()
 

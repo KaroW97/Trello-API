@@ -1,5 +1,4 @@
-const fs = require('fs')
-const { errors, variable, validation } = require('../../lib/index')
+const { errors, validation, common } = require('../../lib/index')
 
 /**
  * Get all data for given board id
@@ -13,7 +12,7 @@ exports.getAllCards = async (boardId) => {
   await validation.validateFile()
 
   // Create read stream
-  const readStream = fs.createReadStream(variable.BOARD_DB)
+  const { readStream } = await common.streamHandler()
 
   // When data search for the card with given id then assing it to item veriabel
   readStream.on('data', (data) => {
@@ -32,6 +31,5 @@ exports.getAllCards = async (boardId) => {
       // Resolve board data
       resolve(item)
     })
-    readStream.on('error', () => rejects(new errors.TransferError()))
   })
 }

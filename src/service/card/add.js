@@ -30,7 +30,7 @@ exports.addNewCard = async (body) => {
   await validation.validateFile()
 
   // Get read and write streams
-  const { readStream, writeStream } = common.streamHandler()
+  const { readStream, writeStream } = await common.streamHandler(true)
 
   // Set id
   board.setId(body.boardId)
@@ -50,7 +50,5 @@ exports.addNewCard = async (body) => {
       // Resolve board data
       resolve(card.getAll())
     })
-    writeStream.on('error', (error) => rejects(error))
-    readStream.on('error', (error) => rejects(error))
   })
 }

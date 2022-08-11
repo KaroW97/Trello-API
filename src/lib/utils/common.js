@@ -3,7 +3,8 @@ const Chance = require('chance')
 const chance = new Chance()
 const fs = require('fs')
 const { BOARD_DB } = require('./variables')
-const { createBackup } = require('./backupUtils')
+const { checkIfExists } = require('./validation')
+const errors = require('./errors')
 
 /**
  * Stringify object
@@ -70,18 +71,28 @@ const randomCardArray = () => {
  * @param {string} fileName
  * @returns {writeStream: fs.WriteStream;readStream: fs.ReadStream;}
  */
-const streamHandler = (fileName = BOARD_DB) => {
-  const writeStream = fs.createWriteStream(fileName)
+const streamHandler = async (createWrite = false, fileName = BOARD_DB) => {
+  if (!(await checkIfExists(fileName))) throw new errors.FileError(fileName)
 
   const readStream = fs.createReadStream(fileName)
 
-  // Create backup
-  createBackup(readStream)
+  let writeStream
 
-  return {
-    writeStream,
-    readStream
-  }
+  if (createWrite) writeStream = fs.createWriteStream(fileName)
+
+  return new Promise((resolve, rejects) => {
+    if (writeStream)
+      writeStream.on('error', (error) =>
+        rejects(new errors.TransferError(error))
+      )
+
+    readStream.on('error', (error) => rejects(new errors.TransferError(error)))
+
+    resolve({
+      writeStream,
+      readStream
+    })
+  })
 }
 
 /**

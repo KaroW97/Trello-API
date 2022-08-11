@@ -1,14 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { card } = require('../service/index')
-const {
-  logger,
-  variable,
-  joi,
-  backupUtils,
-  common,
-  authorize
-} = require('../lib/index')
+const { logger, variable, joi, common, authorize } = require('../lib/index')
 const cache = require('memory-cache')
 
 const loggerTypes = variable.LOGGER_TYPES
@@ -109,16 +102,10 @@ router.delete('/:boardId/:cardId', authorize, async (req, res) => {
     // Log error
     logger.error(loggerTypes.ERROR_DELETE, err)
 
-    // Delete old db and chance name of backup db
-    await backupUtils.restoreBackup()
-
     // Return error message
     res.status(400).json(common.errorMessage(err))
 
     throw err
-  } finally {
-    // Delete backup file
-    backupUtils.deleteFile()
   }
 })
 
@@ -151,16 +138,10 @@ router.post('/:boardId', authorize, async (req, res) => {
     // Log error
     logger.error(loggerTypes.ERROR_ADD, err)
 
-    // Delete old db and chance name of backup db
-    await backupUtils.restoreBackup()
-
     // Return error message
     res.status(400).json(common.errorMessage(err))
 
     throw err
-  } finally {
-    // Delete backup file
-    backupUtils.deleteFile()
   }
 })
 
@@ -191,16 +172,10 @@ router.put('/:boardId/:id', authorize, async (req, res) => {
     // Log error
     logger.error(loggerTypes.ERROR_UPDATE, err)
 
-    // Delete old db and chance name of backup db
-    await backupUtils.restoreBackup()
-
     // Return error message
     res.status(400).json(common.errorMessage(err))
 
     throw err
-  } finally {
-    // Delete backup file
-    backupUtils.deleteFile()
   }
 })
 

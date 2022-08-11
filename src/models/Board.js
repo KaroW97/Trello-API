@@ -64,7 +64,7 @@ module.exports = class Board {
       createAt = this.createAt
     if (this.cards !== undefined && !this.cards.length) cards = []
 
-    return { id, name, color, description, createAt, cards }
+    return { id, createAt, name, color, description, cards }
   }
 
   /**

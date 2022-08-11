@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { Transform } = require('stream')
 const { board } = require('../../models/index')
-const { variable, validation, backupUtils, common } = require('../../lib/index')
+const { variable, validation, common } = require('../../lib/index')
 
 const { BOARD_DB } = variable
 
@@ -35,9 +35,6 @@ exports.addNewRecord = async (body) => {
   // If file exists and its not empty call transform
   if (ifExists && !ifEmpty) {
     const readStream = fs.createReadStream(BOARD_DB, { encoding: 'utf-8' })
-
-    // Create backup file just in case
-    backupUtils.createBackup(readStream)
 
     // Set body to have access in transform
     board.setAll(body)

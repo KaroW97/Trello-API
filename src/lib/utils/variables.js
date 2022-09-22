@@ -1,0 +1,21 @@
+exports.BACKUP_DB = './localDB/boardBackup.json'
+exports.BOARD_DB = './localDB/board.json'
+
+/**
+ * @type {Record<string, string>}
+ */
+exports.LOGGER_TYPES = {
+  FETCH: 'FETCH',
+  FETCH_BY_ID: 'FETCH_BY_ID',
+  DELETE: 'DELETE',
+  UPDATE: 'UPDATE',
+  ADD: 'ADD',
+  ERROR_FETCH: 'ERROR_FETCH',
+  ERROR_FETCH_BY_ID: 'ERROR_FETCH_BY_ID',
+  ERROR_DELETE: 'ERROR_DELETE',
+  ERROR_UPDATE: 'ERROR_UPDATE',
+  ERROR_ADD: 'ERROR_ADD',
+  PAGE_LOAD_ERROR: 'PAGE_LOAD_ERROR',
+  TOKEN_CHECK: 'TOKEN_CHECK',
+  TOKEN_CHECK_ERROR: 'TOKEN_CHECK_ERROR'
+}
